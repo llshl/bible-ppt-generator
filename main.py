@@ -1,3 +1,4 @@
+from BibleCrawler import BibleCrawler
 from PresentationBuilder import PresentationBuilder
 from pptx import Presentation  # 라이브러리
 from pptx.util import Inches  # 사진, 표등을 그리기 위해
@@ -18,7 +19,7 @@ def main():
     print("before size: " + str(beforeSize))
 
     # 본문 말씀 절수
-    bodyPage = 5
+    bodyPage = 29 - 22
 
     # 피피티에서 본문 말씀이 시작되는 위치
     bodyStartPage = 50
@@ -47,9 +48,27 @@ def main():
         print("인덱스 " + str(index) + "번째 슬라이드가 " + str(currentBodyStartPointer) + "번째 인덱스로 이동")
         pptBuilder.move_slide(index, currentBodyStartPointer)
         currentBodyStartPointer += 1
-    pptBuilder.save_ppt()
 
+    pptBuilder.save_ppt()
 #여기까지가 말씀페이지수만큼 복사해서 중간에 삽입하기
 
+    book = "jhn"
+    chap = 14
+    sec = 22
+    endSec = 29
+    bibleCrawler = BibleCrawler()
+    bibleList = bibleCrawler.getBible(book, chap, sec, endSec)
+
+    pptBuilder.insert_text(50, 29 - 22, bibleList)
+    pptBuilder.save_ppt()
+
+# 결국 최종적으로 bodyStartPage번 인덱스부터 (bodyStartPage + bodyPage)번 인덱스까지 본문내용이다
+# book = "jhn"
+# chap = 14
+# sec = 22
+# endSec = 29
+# bibleCrawler = BibleCrawler()
+# bibleList = bibleCrawler.getBible(book, chap, sec, endSec)
+#print(bibleCrawler.getBible(book, chap, sec, endSec))
 if __name__ == "__main__":
     main()
