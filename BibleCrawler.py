@@ -1,34 +1,23 @@
 import requests
 from bs4 import BeautifulSoup as bs
-
+from BlbieDictionary import bible
 
 class BibleCrawler:
-
-    # def __init__(self, book, chap, sec, endSec):
-    #     self.book = book
-    #     self.chap = chap
-    #     self.sec = sec
-    #     self.endSec = endSec
-
-    def getBible(self, book, chap, sec, endSec):
-        bibleList = []
+    def get_bible(self, book, chap, start_verse, end_verse):
+        bible_list = []
         page = requests.get(
             "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=GAE&book={}&chap={}&sec={}&cVersion"
-            "=&fontSize=15px&fontWeight=normal#focus".format(book, chap, sec))
+            "=&fontSize=15px&fontWeight=normal#focus".format(bible[book], chap, start_verse))
         soup = bs(page.text, "html.parser")
 
         elements = soup.select('#tdBible1 > span')
 
-        # 23   하나님이 우리를 사랑하사~~ 처럼 "숫자몇자리 + 공백3개 + 본문"의 형태이다
-        # 공백3개는 그냥 공백이 아니고 nbsp이기에 일반공백으로 replace
-        # 앞 3문자를 자른다 왜? 절 수가 한자리에서 최대 3자리일것인데 앞 세자리를 자르면 1자리수 절수이든 3자리수 절수이든 문자열 맨 좌측은 공백만 남게되기에
-        # 맨 왼쪽 공백 지우기 함수 사용
-        for index in range(sec, endSec + 1):
-            transformedString = elements[index].text.replace(u'\xa0', u' ')  # nbsp 제거하기  
-            transformedString = transformedString[2:len(transformedString)]
-            transformedString = transformedString.strip()
-            # print(transformedString)
-            bibleList.append(transformedString)
+        # elements의 각 요소는 [숫자][공백3개][내용]의 형태
+        for index in range(start_verse, end_verse + 1):
+            transformed_string = elements[index].text.replace(u'\xa0', u' ')  # nbsp 제거하기  
+            transformed_string = transformed_string[2:len(transformed_string)] # 앞에서부터 3자리 지우기
+            transformed_string = transformed_string.strip() # 앞뒤 공백제거
+            transformed_string = " " + transformed_string # 맨앞 공백1개 추가
+            bible_list.append(transformed_string)
 
-        # 한 절씩 깔끔하게 문자열로 들어간 배열 반환환
-        return bibleList
+        return bible_list
